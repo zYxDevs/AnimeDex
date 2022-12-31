@@ -84,8 +84,7 @@ def get_episode(anime, episode):
 
     aid = ep[episode-1].split('-episode-')[0]
 
-    btn_html = get_selector_btns(
-        f"/episode/{anime}/", int(episode), int(total_eps))
+    btn_html = get_selector_btns(f"/episode/{anime}/", episode, int(total_eps))
     ep_html, iframe = episodeHtml(eps, f'{anime} - Episode {episode}')
 
     temp = render_template(
