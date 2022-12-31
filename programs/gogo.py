@@ -16,19 +16,21 @@ class GoGoApi:
         self.host = 'gogoanime.bid'
 
     def search(self, query, url_only=False):
-        soup = bs(requests.get(
-            f'https://{self.host}/search.html?keyword='+query).content, 'html.parser')
+        soup = bs(
+            requests.get(
+                f'https://{self.host}/search.html?keyword={query}'
+            ).content,
+            'html.parser',
+        )
         div = soup.find('ul', 'items')
         animes = div.find_all('li')
 
+        results = []
         if url_only:
-            results = []
             for i in animes:
                 url = i.find('a').get('href').replace('/category/', '')
                 results.append(url)
-            return results
         else:
-            results = []
             for i in animes:
                 url = i.find('a').get('href').replace('/category/', '')
                 img = i.find('img').get('src')
@@ -37,11 +39,14 @@ class GoGoApi:
                 results.append(
                     Anime(url, img, released, title, None)
                 )
-            return results
+
+        return results
 
     def anime(self, anime):
-        soup = bs(requests.get(
-            f'https://{self.host}/category/'+anime).content, 'html.parser')
+        soup = bs(
+            requests.get(f'https://{self.host}/category/{anime}').content,
+            'html.parser',
+        )
 
         if soup.find('title').text == "Pages not found":
             return 'Error'
@@ -67,10 +72,7 @@ class GoGoApi:
         except:
             genres = '?'
         img = soup.find('div', 'anime_info_body_bg').find('img').get('src')
-        if 'dub' in anime.lower():
-            dub = 'DUB'
-        else:
-            dub = 'SUB'
+        dub = 'DUB' if 'dub' in anime.lower() else 'SUB'
         try:
             year = types[3].text.replace('Released: ', '').strip()
         except:
@@ -135,7 +137,7 @@ class GoGoApi:
         for i in a:
             url = i.get('data-video')
             if not url.startswith('https'):
-                url = 'https:'+url
+                url = f'https:{url}'
 
             if 'mixdrop.co' in url:
                 url = url.replace('mixdrop.co', 'mixdrop.ch')
@@ -145,18 +147,15 @@ class GoGoApi:
         dlink = soup.find('li', 'dowloads').find('a').get('href')
         if 'dub' in anime:
             data['DUB'] = embeds
-            data['DL'] = {}
-            data['DL']['DUB'] = dlink
+            data['DL'] = {'DUB': dlink}
         else:
             data['SUB'] = embeds
-            data['DL'] = {}
-            data['DL']['SUB'] = dlink
+            data['DL'] = {'SUB': dlink}
             anime = anime.split(
                 '-episode-')[0] + '-dub' + '-episode-' + anime.split('-episode-')[1]
             soup = bs(requests.get(
                 f'https://{self.host}/{anime}').content, 'html.parser')
-            error = soup.find('h1', 'entry-title')
-            if error:
+            if error := soup.find('h1', 'entry-title'):
                 return data
             div = soup.find('div', 'anime_muti_link')
             a = div.find_all('a')
@@ -166,7 +165,7 @@ class GoGoApi:
                 url = i.get('data-video')
 
                 if not url.startswith('https'):
-                    url = 'https:'+url
+                    url = f'https:{url}'
 
                 if 'mixdrop.co' in url:
                     url = url.replace('mixdrop.co', 'mixdrop.ch')

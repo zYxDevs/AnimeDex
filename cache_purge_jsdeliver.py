@@ -12,5 +12,5 @@ urls = ['https://cdn.jsdelivr.net/gh/TechShreyash/AnimeDex@main/static/js/home.m
 
 for url in urls:
     url = url[24:]
-    r = requests.get('https://purge.jsdelivr.net'+url)
+    r = requests.get(f'https://purge.jsdelivr.net{url}')
     print(r.json().get('status'), url)

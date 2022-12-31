@@ -60,11 +60,11 @@ def get_html(data):
         x = ANIME_POS.format(
             i.url,
             i.lang,
-            'Ep '+str(i.episode).strip(),
+            f'Ep {str(i.episode).strip()}',
             i.img,
             i.title,
             f'Latest {i.lang}',
-            'HD'
+            'HD',
         )
         html += x
 

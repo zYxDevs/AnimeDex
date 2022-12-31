@@ -5,13 +5,8 @@ from string import digits
 
 
 def get_names(li):
-    x = ''
-
-    for i in li:
-        x += i + ', '
-
-    x = x[:-2]
-    return x
+    x = ''.join(f'{i}, ' for i in li)
+    return x[:-2]
 
 
 def get_title(tit):
@@ -77,15 +72,11 @@ def get_targets(list):
 
 
 def get_atitle(title):
-    if not title:
-        return 'Unknown'
-
-    tit = title.get('english')
-    if not tit:
-        tit = title.get('romaji')
-        if not tit:
-            tit = title.get('native')
-    return tit
+    return (
+        title.get('english') or title.get('romaji') or title.get('native')
+        if title
+        else 'Unknown'
+    )
 
 
 def get_other_title(title):
@@ -94,31 +85,27 @@ def get_other_title(title):
     other = ''
     tit = title.get('english')
     if tit:
-        other += tit+', '
+        other += f'{tit}, '
     tit = title.get('romaji')
     if tit:
-        other += tit+', '
+        other += f'{tit}, '
     tit = title.get('native')
     if tit:
-        other += tit + ', '
+        other += f'{tit}, '
     return tit[:-2]
 
 
 def get_studios(stud):
-    tit = ''
-    for i in stud:
-        tit += i.get('name') + ', '
+    tit = ''.join(i.get('name') + ', ' for i in stud)
     return tit[:-2]
 
 
 def get_genre(genres):
-    if not genres or len(genres) == 0:
-        return ''
-    return random.choice(genres)
+    return '' if not genres or len(genres) == 0 else random.choice(genres)
 
 
 def get_urls(title):
-    return '/anime/' + str(requests.utils.quote(title))
+    return f'/anime/{str(requests.utils.quote(title))}'
 
 
 def get_t_from_u(url):

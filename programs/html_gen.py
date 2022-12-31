@@ -6,12 +6,7 @@ from programs.anilist import Anilist
 
 def get_genre_html(li):
     x = """<a>{}</a>"""
-    html = ''
-
-    for i in li:
-        html += x.format(i.strip())
-
-    return html
+    return ''.join(x.format(i.strip()) for i in li)
 
 
 def get_eps_html(anime, aid=None):
@@ -20,22 +15,18 @@ def get_eps_html(anime, aid=None):
     total, data = GoGoApi().get_episodes(aid)
     x = """<a class="ep-btn" href="{}">{}</a>"""
     html = ''
-    pos = 1
-    for i in data:
+    for pos, i in enumerate(data, start=1):
         i = i.replace('-episode-', '/')
         html += x.format(f'/episode/{i}', str(pos))
-        pos += 1
     return html, data[0].replace('-episode-', '/')
 
 
 def get_eps_html2(data):
     x = """<a class="ep-btn" href="{}">{}</a>"""
     html = ''
-    pos = 1
-    for i in data:
+    for pos, i in enumerate(data, start=1):
         i = i.replace('-episode-', '/')
         html += x.format(f'/episode/{i}', str(pos))
-        pos += 1
     return html
 
 
@@ -141,17 +132,8 @@ def get_search_html(data: Anime):
     html = ''
 
     for i in data:
-        if 'dub' in i.url.lower():
-            d = 'DUB'
-        else:
-            d = 'SUB'
-        x = ANIME_POS2.format(
-            '/anime/'+i.url,
-            d,
-            i.img,
-            i.title,
-            i.lang,
-        )
+        d = 'DUB' if 'dub' in i.url.lower() else 'SUB'
+        x = ANIME_POS2.format(f'/anime/{i.url}', d, i.img, i.title, i.lang)
         html += x
 
     return html
@@ -166,11 +148,11 @@ def get_recent_html(data):
         x = ANIME_POS.format(
             i.url,
             i.lang,
-            'Ep '+str(i.episode).strip(),
+            f'Ep {str(i.episode).strip()}',
             i.img,
             i.title,
             f'Latest {i.lang}',
-            'HD'
+            'HD',
         )
         html += x
 
@@ -247,13 +229,10 @@ def slider_gen():
     data = Anilist().trending()
     random.shuffle(data)
     html = ''
-    pos = 1
-
-    for i in data:
-        img = i.get('bannerImage')
-        if not img:
-            img = i.get('coverImage').get('medium').replace(
-                'small', 'large').replace('medium', 'large')
+    for pos, i in enumerate(data, start=1):
+        img = i.get('bannerImage') or i.get('coverImage').get(
+            'medium'
+        ).replace('small', 'large').replace('medium', 'large')
         title = get_atitle(i.get('title'))
         url = get_urls(title)
         temp = SLIDER_HTML.format(
@@ -270,7 +249,6 @@ def slider_gen():
             img
         )
         html += temp
-        pos += 1
     return html
 
 
@@ -309,13 +287,11 @@ def episodeHtml(episode, title):
             d += 1
 
     if DL:
-        link = DL.get('SUB')
-        if link:
+        if link := DL.get('SUB'):
             sub += f"""<div class="sitem">
                     <a class="sobtn download" target="_blank" href="{link}"><i class="fa fa-download"></i>Download</a>
                 </div>"""
-        link = DL.get('DUB')
-        if link:
+        if link := DL.get('DUB'):
             dub += f"""<div class="sitem">
                     <a class="sobtn download" target="_blank" href="{link}"><i class="fa fa-download"></i>Download</a>
                 </div>"""
